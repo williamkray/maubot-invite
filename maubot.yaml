@@ -1,0 +1,11 @@
+maubot: 0.1.0
+id: org.jobmachine.invitebot
+version: 0.0.1
+license: MIT
+modules:
+- invite
+main_class: Invite
+database: false
+
+extra_files:
+- base-config.yaml

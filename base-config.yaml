@@ -1,0 +1,12 @@
+# admin secret for the matrix-registration instance
+admin_secret: mYsUp3rs3CretKEY12345
+
+# how to get to the matrix-registration instance
+# note the lack of trailing slash!
+reg_url: 'https://www.yourwebsite.com'
+# the duration the invitation should be valid, in days, before expiring
+expiration: 3
+
+# approved members who can generate invite tokens
+admins:
+- '@admin:yourwebsite.com'
