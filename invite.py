@@ -75,3 +75,74 @@ class Invite(Plugin):
                 f"If it expires before use, you must request a new token."
             ]
             ), allow_html=True)
+
+    @invite.subcommand("status", help="Return the status of an invite token.")
+    @command.argument("token", "Token", pass_raw=True, required=True)
+    async def status(self, evt: MessageEvent, token: str) -> None:
+        await evt.mark_read()
+
+        if not await self.can_manage(evt):
+            return
+
+        if not token:
+            await evt.respond("you must supply a token to check")
+
+        headers = {
+            'Authorization': f"SharedSecret {self.config['admin_secret']}",
+            'Content-Type': 'application/json'
+            }
+
+        try:
+            response = requests.request("GET", f"{self.config['reg_url']}/token/{token}", headers=headers)
+        except Exception as e:
+            await evt.respond(f"request failed: {e.message}")
+            return None
+        
+        # this isn't formatted nicely but i don't really care that much
+        await evt.respond(f"Status of token {token}: {json.dumps(response.json(), indent=4)}")
+
+    @invite.subcommand("revoke", help="Disable an existing invite token.")
+    @command.argument("token", "Token", pass_raw=True, required=True)
+    async def revoke(self, evt: MessageEvent, token: str) -> None:
+        await evt.mark_read()
+
+        if not await self.can_manage(evt):
+            return
+
+        if not token:
+            await evt.respond("you must supply a token to revoke")
+
+        headers = {
+            'Authorization': f"SharedSecret {self.config['admin_secret']}",
+            'Content-Type': 'application/json'
+            }
+
+        try:
+            response = requests.request("PUT", f"{self.config['reg_url']}/token/{token}", headers=headers, \
+                    json={"disable": True})
+        except Exception as e:
+            await evt.respond(f"request failed: {e.message}")
+            return None
+        
+        # this isn't formatted nicely but i don't really care that much
+        await evt.respond(f"{json.dumps(response.json(), indent=4)}")
+
+    @invite.subcommand("list", help="List all tokens that have been generated.")
+    async def list(self, evt: MessageEvent) -> None:
+        await evt.mark_read()
+
+        if not await self.can_manage(evt):
+            return
+
+        headers = {
+            'Authorization': f"SharedSecret {self.config['admin_secret']}"
+            }
+
+        try:
+            response = requests.request("GET", f"{self.config['reg_url']}/token", headers=headers)
+        except Exception as e:
+            await evt.respond(f"request failed: {e.message}")
+            return None
+        
+        # this isn't formatted nicely but i don't really care that much
+        await evt.respond(f"{response.json()}")
