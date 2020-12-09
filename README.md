@@ -8,4 +8,16 @@ once your bot is running, simply use the command
 
 to generate a token with some generic text you can copy-paste when sharing it with your invitee!
 
-future plans to manage existing tokens seem like a good idea, although i don't know if i'll have the energy to implement. PRs are welcome!
+to check the status of a specific token, use
+
+    !invite status MyTokenName
+
+and similarly to list all tokens in the database, use
+
+    !invite list
+
+to revoke a token, use
+
+    !invite revoke MyTokenName
+
+please note: i haven't made the json output of those responses pretty. sorry not sorry.
