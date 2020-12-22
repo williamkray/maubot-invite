@@ -148,4 +148,4 @@ class Invite(Plugin):
             return None
         
         # this isn't formatted nicely but i don't really care that much
-        await evt.respond(f"{response.json()}")
+        await evt.respond(f"{resp_json}")
