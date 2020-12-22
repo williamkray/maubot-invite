@@ -4,7 +4,6 @@ from mautrix.util.config import BaseProxyConfig, ConfigUpdateHelper
 from maubot import Plugin, MessageEvent
 from maubot.handlers import command
 
-import requests
 import json
 import datetime
 
@@ -52,16 +51,17 @@ class Invite(Plugin):
             }
         
         try:
-            response = requests.request("POST", f"{self.config['reg_url']}/token", headers=headers, \
+            response = await self.http.post(f"{self.config['reg_url']}/token", headers=headers, \
                     json={"one_time": True, "ex_date": ex_date})
+            resp_json = await response.json()
         except Exception as e:
             await evt.respond(f"request failed: {e.message}")
             return None
         try:
-            token = response.json()['name']
+            token = resp_json['name']
         except Exception as e:
             await evt.respond(f"I got a bad response back, sorry, something is borked. \n\
-                    {response.json()}")
+                    {resp_json}")
             self.log.exception(e)
             return None
         
@@ -93,13 +93,14 @@ class Invite(Plugin):
             }
 
         try:
-            response = requests.request("GET", f"{self.config['reg_url']}/token/{token}", headers=headers)
+            response = await self.http.get(f"{self.config['reg_url']}/token/{token}", headers=headers)
+            resp_json = await response.json()
         except Exception as e:
             await evt.respond(f"request failed: {e.message}")
             return None
         
         # this isn't formatted nicely but i don't really care that much
-        await evt.respond(f"Status of token {token}: {json.dumps(response.json(), indent=4)}")
+        await evt.respond(f"Status of token {token}: {json.dumps(resp_json, indent=4)}")
 
     @invite.subcommand("revoke", help="Disable an existing invite token.")
     @command.argument("token", "Token", pass_raw=True, required=True)
@@ -118,14 +119,15 @@ class Invite(Plugin):
             }
 
         try:
-            response = requests.request("PUT", f"{self.config['reg_url']}/token/{token}", headers=headers, \
+            response = await self.http.put(f"{self.config['reg_url']}/token/{token}", headers=headers, \
                     json={"disable": True})
+            resp_json = await response.json()
         except Exception as e:
             await evt.respond(f"request failed: {e.message}")
             return None
         
         # this isn't formatted nicely but i don't really care that much
-        await evt.respond(f"{json.dumps(response.json(), indent=4)}")
+        await evt.respond(f"{json.dumps(resp_json, indent=4)}")
 
     @invite.subcommand("list", help="List all tokens that have been generated.")
     async def list(self, evt: MessageEvent) -> None:
@@ -139,7 +141,8 @@ class Invite(Plugin):
             }
 
         try:
-            response = requests.request("GET", f"{self.config['reg_url']}/token", headers=headers)
+            response = await self.http.get(f"{self.config['reg_url']}/token", headers=headers)
+            resp_json = await response.json()
         except Exception as e:
             await evt.respond(f"request failed: {e.message}")
             return None
