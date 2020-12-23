@@ -100,7 +100,7 @@ class Invite(Plugin):
             return None
         
         # this isn't formatted nicely but i don't really care that much
-        await evt.respond(f"Status of token {token}: {json.dumps(resp_json, indent=4)}")
+        await evt.respond(f"Status of token {token}: \n<pre><code format=json>{json.dumps(resp_json, indent=4)}</code></pre>", allow_html=True)
 
     @invite.subcommand("revoke", help="Disable an existing invite token.")
     @command.argument("token", "Token", pass_raw=True, required=True)
@@ -127,7 +127,7 @@ class Invite(Plugin):
             return None
         
         # this isn't formatted nicely but i don't really care that much
-        await evt.respond(f"{json.dumps(resp_json, indent=4)}")
+        await evt.respond(f"<pre><code format=json>{json.dumps(resp_json, indent=4)}</code></pre>", allow_html=True)
 
     @invite.subcommand("list", help="List all tokens that have been generated.")
     async def list(self, evt: MessageEvent) -> None:
@@ -148,4 +148,4 @@ class Invite(Plugin):
             return None
         
         # this isn't formatted nicely but i don't really care that much
-        await evt.respond(f"{resp_json}")
+        await evt.respond(f"<pre><code format=json>{json.dumps(resp_json, indent=4)}</code></pre>", allow_html=True)
