@@ -10,6 +10,7 @@ import datetime
 class Config(BaseProxyConfig):
     def do_update(self, helper: ConfigUpdateHelper) -> None:
         helper.copy("admin_secret")
+        helper.copy("legacy_mr")
         helper.copy("reg_url")
         helper.copy("admins")
         helper.copy("expiration")
@@ -30,6 +31,12 @@ class Invite(Plugin):
             await evt.respond("You don't have permission to manage invitations for this server.")
             return False
 
+    def set_api_endpoints(self) -> None:
+        self.config["api_url"] = self.config["reg_url"] + "/api"
+
+        if self.config["legacy_mr"] == True:
+            self.config["api_url"] = self.config["reg_url"]
+
     @command.new(name="invite", help="Generate a unique invitation code to this matrix homeserver", \
             require_subcommand=True)
     async def invite(self, evt: MessageEvent) -> None:
@@ -42,6 +49,8 @@ class Invite(Plugin):
         if not await self.can_manage(evt):
             return
 
+        self.set_api_endpoints()
+
         ex_date = datetime.datetime.strftime( \
                 (datetime.date.today() + datetime.timedelta(days=self.config["expiration"])), \
                 "%m.%d.%Y")
@@ -51,8 +60,8 @@ class Invite(Plugin):
             }
         
         try:
-            response = await self.http.post(f"{self.config['reg_url']}/token", headers=headers, \
-                    json={"one_time": True, "ex_date": ex_date})
+            response = await self.http.post(f"{self.config['api_url']}/token", headers=headers, \
+                        json={"one_time": True, "ex_date": ex_date})
             resp_json = await response.json()
         except Exception as e:
             await evt.respond(f"request failed: {e.message}")
@@ -84,6 +93,8 @@ class Invite(Plugin):
         if not await self.can_manage(evt):
             return
 
+        self.set_api_endpoints()
+
         if not token:
             await evt.respond("you must supply a token to check")
 
@@ -93,7 +104,7 @@ class Invite(Plugin):
             }
 
         try:
-            response = await self.http.get(f"{self.config['reg_url']}/token/{token}", headers=headers)
+            response = await self.http.get(f"{self.config['api_url']}/token/{token}", headers=headers)
             resp_json = await response.json()
         except Exception as e:
             await evt.respond(f"request failed: {e.message}")
@@ -110,6 +121,8 @@ class Invite(Plugin):
         if not await self.can_manage(evt):
             return
 
+        self.set_api_endpoints()
+
         if not token:
             await evt.respond("you must supply a token to revoke")
 
@@ -118,13 +131,24 @@ class Invite(Plugin):
             'Content-Type': 'application/json'
             }
 
-        try:
-            response = await self.http.put(f"{self.config['reg_url']}/token/{token}", headers=headers, \
-                    json={"disable": True})
-            resp_json = await response.json()
-        except Exception as e:
-            await evt.respond(f"request failed: {e.message}")
-            return None
+        # this is a really gross way of handling legacy installs and should be cleaned up
+        # basically this command used to use PUT but now uses PATCH
+        if self.config["legacy_mr"] == True:
+            try:
+                response = await self.http.put(f"{self.config['api_url']}/token/{token}", headers=headers, \
+                        json={"disable": True})
+                resp_json = await response.json()
+            except Exception as e:
+                await evt.respond(f"request failed: {e.message}")
+                return None
+        else:
+            try:
+                response = await self.http.patch(f"{self.config['api_url']}/token/{token}", headers=headers, \
+                        json={"disable": True})
+                resp_json = await response.json()
+            except Exception as e:
+                await evt.respond(f"request failed: {e.message}")
+                return None
         
         # this isn't formatted nicely but i don't really care that much
         await evt.respond(f"<pre><code format=json>{json.dumps(resp_json, indent=4)}</code></pre>", allow_html=True)
@@ -136,12 +160,14 @@ class Invite(Plugin):
         if not await self.can_manage(evt):
             return
 
+        self.set_api_endpoints()
+
         headers = {
             'Authorization': f"SharedSecret {self.config['admin_secret']}"
             }
 
         try:
-            response = await self.http.get(f"{self.config['reg_url']}/token", headers=headers)
+            response = await self.http.get(f"{self.config['api_url']}/token", headers=headers)
             resp_json = await response.json()
         except Exception as e:
             await evt.respond(f"request failed: {e.message}")

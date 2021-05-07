@@ -1,5 +1,9 @@
 # admin secret for the matrix-registration instance
 admin_secret: mYsUp3rs3CretKEY12345
+# versions of matrix-registration earlier than 0.9.0 used
+# a different api endpoint. if you are running a version
+# that is greater than or equal to 0.9.0, set this to false
+legacy_mr: true
 
 # how to get to the matrix-registration instance
 # note the lack of trailing slash!
