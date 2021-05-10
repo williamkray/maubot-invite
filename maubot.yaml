@@ -1,5 +1,5 @@
 maubot: 0.1.0
-id: org.jobmachine.invitebot.dev
+id: org.jobmachine.invitebot
 version: 0.2.0
 license: MIT
 modules:
