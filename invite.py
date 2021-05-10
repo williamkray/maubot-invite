@@ -53,7 +53,7 @@ class Invite(Plugin):
 
         ex_date = datetime.datetime.strftime( \
                 (datetime.date.today() + datetime.timedelta(days=self.config["expiration"])), \
-                "%Y.%m.%d")
+                "%Y-%m-%d")
         # use re-ordered date if using legacy code
         if self.config["legacy_mr"] == True:
             ex_date = datetime.datetime.strftime( \
@@ -66,7 +66,7 @@ class Invite(Plugin):
         
         try:
             response = await self.http.post(f"{self.config['api_url']}/token", headers=headers, \
-                    json={"max_usage": 1, "one_time": True, "ex_date": ex_date})
+                    json={"max_usage": 1, "one_time": True, "ex_date": ex_date, "expiration_date": ex_date})
             resp_json = await response.json()
         except Exception as e:
             await evt.respond(f"request failed: {e.message}")
@@ -149,7 +149,7 @@ class Invite(Plugin):
         else:
             try:
                 response = await self.http.patch(f"{self.config['api_url']}/token/{token}", headers=headers, \
-                        json={"disable": True})
+                        json={"disabled": True})
                 resp_json = await response.json()
             except Exception as e:
                 await evt.respond(f"request failed: {e.message}")

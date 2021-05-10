@@ -1,9 +1,10 @@
 this is a simple [maubot](https://github.com/maubot/maubot) plugin which interacts with a [matrix-registration](https://github.com/zeratax/matrix-registration) deployment and generates invite tokens.
 
-###Warning
-this bot currently only works with matrix-registration versions 0.7.x. Newer implementations (currently in development as of this comment) use different api endpoints and logic, and I haven't written those changes into this code. PRs are welcomed!
-
 modify the config to point to your matrix-registration url, include your admin secret to authenticate, and ensure that you're in the list of approved users.
+
+*please note* that matrix-registration versions BELOW 0.9.0 have different API endpoints, expected date structures, json
+arguments, etc. and require the `legacy_mr` value in your config to be set to `True`! If your matrix-registration
+instance is 0.9.0 or greater, leave this as `false`.
 
 once your bot is running, simply use the command
 
@@ -23,4 +24,3 @@ to revoke a token, use
 
     !invite revoke MyTokenName
 
-please note: i haven't made the json output of those responses pretty. sorry not sorry.
