@@ -12,6 +12,7 @@ class Config(BaseProxyConfig):
         helper.copy("admin_secret")
         helper.copy("legacy_mr")
         helper.copy("reg_url")
+        helper.copy("reg_page")
         helper.copy("admins")
         helper.copy("expiration")
 
@@ -84,7 +85,7 @@ class Invite(Plugin):
                 f"Invitation token {token} created! You may share the following message with your invitee:",
                 f"",
                 f"Your unique url for registering is:",
-                f"{self.config['reg_url']}/register?token={token}",
+                f"{self.config['reg_url']}{self.config['reg_page']}?token={token}",
                 f"This invite token will expire in {self.config['expiration']} days.",
                 f"If it expires before use, you must request a new token."
             ]

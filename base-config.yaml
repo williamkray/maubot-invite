@@ -8,6 +8,12 @@ legacy_mr: true
 # how to get to the matrix-registration instance
 # note the lack of trailing slash!
 reg_url: 'https://www.yourwebsite.com'
+
+# the URI to use for registering tokens
+# leave this as the default value unless you are using
+# a custom registration page!
+reg_page: '/register'
+
 # the duration the invitation should be valid, in days, before expiring
 expiration: 3
 
