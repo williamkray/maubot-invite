@@ -3,16 +3,43 @@ admin_secret: mYsUp3rs3CretKEY12345
 # versions of matrix-registration earlier than 0.9.0 used
 # a different api endpoint. if you are running a version
 # that is greater than or equal to 0.9.0, set this to false
-legacy_mr: true
+legacy_mr: false
 
 # how to get to the matrix-registration instance
 # note the lack of trailing slash!
+# e.g.
+# reg_url: http://localhost:5000
 reg_url: 'https://www.yourwebsite.com'
 
 # the URI to use for registering tokens
 # leave this as the default value unless you are using
 # a custom registration page!
+# you can also set this to a full URL if your registration
+# page is accessible by a completely different host from
+# your registration endpoint, just be sure to update your
+# formatted message below to remove the reg_url value.
+# e.g.
+# reg_page: https://someotherwebsite.com/registration-page.html
 reg_page: '/register'
+
+# the html-formatted text you would like the bot to respond with
+# when a new token is generated. you may use the following variables:
+# {token} for the registration token
+# {reg_url} for the registration url set in this config
+# {reg_page} for the registration uri set in this config
+# {expiration} for the expiration value set in this config
+#
+# if unset, a default message will be used.
+#
+# example message:
+#
+message: |
+  Invitation token <b>{token}</b> created!<br />
+  <br />
+  Your unique url for registering is:<br />
+  {reg_url}{reg_page}?token={token}<br />
+  This invite token will expire in {expiration} days.<br />
+  If it expires before use, you must request a new token.
 
 # the duration the invitation should be valid, in days, before expiring
 expiration: 3
