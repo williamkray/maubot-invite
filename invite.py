@@ -15,6 +15,7 @@ class Config(BaseProxyConfig):
         helper.copy("reg_page")
         helper.copy("admins")
         helper.copy("expiration")
+        helper.copy("message")
 
 class Invite(Plugin):
     async def start(self) -> None:
@@ -79,17 +80,22 @@ class Invite(Plugin):
                     {resp_json}")
             self.log.exception(e)
             return None
-        
-        await evt.respond('<br />'.join(
+
+        msg = '<br />'.join(
             [
-                f"Invitation token {token} created! You may share the following message with your invitee:",
+                f"Invitation token <b>{token}</b> created!",
                 f"",
                 f"Your unique url for registering is:",
                 f"{self.config['reg_url']}{self.config['reg_page']}?token={token}",
                 f"This invite token will expire in {self.config['expiration']} days.",
                 f"If it expires before use, you must request a new token."
-            ]
-            ), allow_html=True)
+            ])
+
+        if self.config['message']:
+            msg = self.config["message"].format(token=token, reg_url=self.config['reg_url'],
+                    reg_page=self.config['reg_page'], expiration=self.config['expiration'])
+        
+        await evt.respond(msg, allow_html=True)
 
     @invite.subcommand("status", help="Return the status of an invite token.")
     @command.argument("token", "Token", pass_raw=True, required=True)
