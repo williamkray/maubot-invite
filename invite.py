@@ -69,9 +69,14 @@ class Invite(Plugin):
         try:
             response = await self.http.post(f"{self.config['api_url']}/token", headers=headers, \
                     json={"max_usage": 1, "one_time": True, "ex_date": ex_date, "expiration_date": ex_date})
+            status = response.status
             resp_json = await response.json()
         except Exception as e:
-            await evt.respond(f"request failed: {e.message}")
+            body = await response.text()
+            await evt.respond(f"Uh oh! I got a {status} response from your registration endpoint:<br /> \
+                        {body}<br /> \
+                        which prompted me to produce this error:<br /> \
+                        <code>{e.message}</code>", allow_html=True)
             return None
         try:
             token = resp_json['name']
